@@ -6,9 +6,9 @@ public class Producer extends Thread {
     }
 
     public void run() {
-        for (int i = 0; i < 10; i++) {
+        while (true) {
             try {
-                buffer.produce(i);
+                buffer.produce(1);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
