@@ -9,7 +9,7 @@ class ConcurrentGaussSolver {
 public:
     explicit ConcurrentGaussSolver(const std::string &filename);
 
-    void printM() const;
+    void saveToFile(const std::string &filename) const;
     void solve();
     void backwardSubstitution();
 

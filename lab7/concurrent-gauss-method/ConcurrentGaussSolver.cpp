@@ -4,6 +4,7 @@
 #include <fstream>
 #include <thread>
 #include <future>
+#include <iomanip>
 
 ConcurrentGaussSolver::ConcurrentGaussSolver(const std::string &filename) {
     std::ifstream file(filename);
@@ -44,20 +45,32 @@ ConcurrentGaussSolver::ConcurrentGaussSolver(const std::string &filename) {
     threadPool_ = std::make_unique<ThreadPool>(std::thread::hardware_concurrency());
 }
 
-void ConcurrentGaussSolver::printM() const {
-    std::cout << std::endl;
+void ConcurrentGaussSolver::saveToFile(const std::string &filename) const {
+    std::ofstream outFile(filename);  // Create and open an ofstream for output
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    outFile << std::fixed << std::setprecision(6);
+
+    outFile << size_ << std::endl;
+
     for (int i = 0; i < size_; i++) {
         for (int j = 0; j < size_; j++) {
             const auto value = M_[i][j] > 1e-6 ? M_[i][j] : 0.0;
-            std::cout << value  << " ";
+            outFile << value << " ";
         }
-        std::cout << std::endl;
+        outFile << std::endl;
     }
 
     for (int i = 0; i < size_; i++) {
-        std::cout << M_[i][size_] << " ";
+        outFile << M_[i][size_] << " ";
     }
+    outFile << std::endl;
+
+    outFile.close();  // Close the file when done
 }
+
 
 void ConcurrentGaussSolver::solve() {
     for (int i = 0; i < size_; ++i) {

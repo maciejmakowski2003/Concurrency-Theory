@@ -8,7 +8,7 @@ int main() {
 
     solver->solve();
     solver->backwardSubstitution();
-    solver->printM();
+    solver->saveToFile("../solution.txt");
 
     return 0;
 }
