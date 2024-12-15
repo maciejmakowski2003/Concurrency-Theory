@@ -59,10 +59,9 @@ $$\text{Cały algorytm możemy przedstawić jako ciąg występujących po sobie 
 
 ### Graf Diekerta dla macierzy 4x5
 
-TODO
-
 $$\text{Korzystając z wyznaczonych zależności oraz opisu algorytmu możemy wyznaczyć graf dla macierzy 4x5.}$$
 
+![](./graph.png)
 
 <br />
 
@@ -81,3 +80,50 @@ $$[F_{A_{1}}][F_{B_{1}}][F_{C_{1}}][F_{A_{2}}][F_{B_{2}}][F_{C_{2}}]\dots[F_{A_{
 <br />
 
 ## Implementacja współbieżnego algorytmu eliminacji Gaussa
+
+### Opis klasy ConcurrentGaussSolver
+
+```cpp
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+class ConcurrentGaussSolver {
+public:
+    explicit ConcurrentGaussSolver(const std::string &filename);
+
+    void printM() const;
+    void solve();
+    void backwardSubstitution();
+
+private:
+    // rozmiar macierzy
+    int size_;
+    // macierz
+    std::vector<std::vector<double>> M_;
+    /* 
+        tablica pomocnicza m - wystarczy nam o rozmiarze size_ gdyż, 
+        naraz wyliczamy współczynniki  wszystkich dla k > i (i określone)
+     */
+    std::vector<double> m_;
+     /* 
+        tablica pomocnicza n - wystarczy nam o rozmiarze size_ + 1 x size_ gdyż, 
+        naraz wyliczamy współczynniki wszystkich dla k > i oraz j >= i(i określone) 
+     */
+    std::vector<std::vector<double>> n_;
+
+    // operacja A
+    void A(int k, int i);
+    // operacja B
+    void B(int k, int j, int i);
+    // operacja C
+    void C(int k, int j, int i);
+
+    // scheduling konkretnej klasy Foaty
+    void scheduleA(int i);
+    void scheduleB(int i);
+    void scheduleC(int i);
+};
+```
