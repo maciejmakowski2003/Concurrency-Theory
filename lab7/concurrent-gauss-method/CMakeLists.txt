@@ -6,4 +6,6 @@ set(CMAKE_CXX_STANDARD 23)
 add_executable(concurrent_gauss_method main.cpp
         ConcurrentGaussSolver.cpp
         ConcurrentGaussSolver.h
+        ThreadPool.cpp
+        ThreadPool.h
 )

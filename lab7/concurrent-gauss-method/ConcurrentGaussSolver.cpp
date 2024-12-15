@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <thread>
+#include <future>
 
 ConcurrentGaussSolver::ConcurrentGaussSolver(const std::string &filename) {
     std::ifstream file(filename);
@@ -39,6 +40,8 @@ ConcurrentGaussSolver::ConcurrentGaussSolver(const std::string &filename) {
 
     m_ = std::vector(size_, 0.0);
     n_ = std::vector(size_, std::vector(size_ + 1, 0.0));
+
+    threadPool_ = std::make_unique<ThreadPool>(std::thread::hardware_concurrency());
 }
 
 void ConcurrentGaussSolver::printM() const {
@@ -92,39 +95,30 @@ void ConcurrentGaussSolver::C(const int k, const int j, const int i) {
 }
 
 void ConcurrentGaussSolver::scheduleA(const int i) {
-    std::vector<std::thread> threads;
     for (int k = i + 1; k < size_; ++k) {
-        threads.emplace_back([this, k, i]() { A(k, i); });
+        threadPool_->submit([this, k, i]() { A(k, i); });
     }
 
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    threadPool_->wait();
 }
 
 void ConcurrentGaussSolver::scheduleB(const int i) {
-    std::vector<std::thread> threads;
     for (int k = i + 1; k < size_; ++k) {
         for (int j = i; j < size_ + 1; ++j) {
-            threads.emplace_back([this, k, j, i]() { B(k, j, i); });
+            threadPool_->submit([this, k, j, i]() { B(k, j, i); });
         }
     }
 
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    threadPool_->wait();
 }
 
 void ConcurrentGaussSolver::scheduleC(const int i) {
-    std::vector<std::thread> threads;
     for (int k = i + 1; k < size_; ++k) {
         for (int j = i; j < size_ + 1; ++j) {
-            threads.emplace_back([this, k, j, i]() { C(k, j, i); });
+            threadPool_->submit([this, k, j, i]() { C(k, j, i); });
         }
     }
 
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    threadPool_->wait();
 }
 

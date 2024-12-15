@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "ThreadPool.h"
 
 class ConcurrentGaussSolver {
 public:
@@ -17,6 +18,7 @@ private:
     std::vector<std::vector<double>> M_;
     std::vector<double> m_;
     std::vector<std::vector<double>> n_;
+    std::unique_ptr<ThreadPool> threadPool_;
 
     void A(int k, int i);
     void B(int k, int j, int i);
